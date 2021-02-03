@@ -14,8 +14,6 @@ const allowedBranches = ["develop", "master"];
 
 async function handleMergeHook(req, res, next) {
   try {
-    console.log(req.body);
-
     const { resource, ...data } = req.body;
     if (resource.status !== "completed") return res.send(200);
     const startCommit = resource.lastMergeCommit.commitId;
@@ -55,7 +53,7 @@ async function handleMergeHook(req, res, next) {
     await sendMail(
       html,
       `[${resource.repository.name} UPDATE]: ${resource.createdBy.displayName} merged "${sourceBranch}" into "${targetBranch}"`,
-      "samundra.khatri@joinsage.com"
+      "samundra.kc6@gmail.com"
     );
     console.log("Mail sent");
     res.send(200);
