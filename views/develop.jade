@@ -1,0 +1,21 @@
+extend layout
+
+block content
+    p
+        strong New Updates in #{repo}. You can get an early preview by  
+            a(href=previewHostname) clicking here
+            |   or visit #{previewHostname}
+    div(style="padding-left:4rem")        
+        each val, key in commits
+            if key  !== 'null' && val.items.length
+                p 
+                    strong 
+                        h4(style=`color:${val.color}`)
+                            i(class='material-icons') #{val.icon}
+                            span   #{val.name}
+                    ul
+                    each commit in val.items
+                        li= commit.subject
+    p 
+        h3(style='color:red') PS:  Developers please rebase your working branch with 
+            b #{targetBranch}.     
