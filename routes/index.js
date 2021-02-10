@@ -54,7 +54,7 @@ async function handleMergeHook(req, res, next) {
     sendMail(
       html,
       `${resource.createdBy.displayName} just merged "${sourceBranch}" into "${targetBranch}" with ${concernedCommits.length} commit(s).`,
-      "samundra.khatri@joinsage.com",
+      process.env.MAIL_RECIPIENTS,
       startCase(resource.repository.name)
     );
     console.log("Mail sent");

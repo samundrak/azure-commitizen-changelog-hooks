@@ -8,13 +8,8 @@ block content
     div(style="padding-left:4rem")        
         each val, key in commits
             if key  !== 'null' && val.items.length
-                p 
-                    if val.name === 'Features'
-                        strong 
-                            h1(style=`color:${val.color}`)
-                                span   #{val.name}
-                    el
-                        strong 
+                div 
+                    strong 
                             h4(style=`color:${val.color}`)
                                 span   #{val.name}
                     ul
