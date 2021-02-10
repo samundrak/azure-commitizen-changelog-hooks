@@ -23,10 +23,10 @@ async function handleMergeHook(req, res, next) {
 
     const targetBranch = resource.targetRefName.split("/").pop();
     if (!allowedBranches.includes(targetBranch)) {
-      return res.send(200);
+      return res.sendStatus(200);
     }
     if (!allowedProjects.includes(resource.repository.name))
-      return res.send(200);
+      return res.sendStatus(200);
 
     const topCommit = targetBranch === "develop" ? 20 : 50;
     const commits = await getCommit(resource.repository.name, {
@@ -58,10 +58,10 @@ async function handleMergeHook(req, res, next) {
       startCase(resource.repository.name)
     );
     console.log("Mail sent");
-    res.send(200);
+    res.sendStatus(200);
   } catch (err) {
     console.log(err);
-    res.send(500);
+    res.sendStatus(500);
   }
 }
 router.post("/api/hook", handleMergeHook);
