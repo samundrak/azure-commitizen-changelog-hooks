@@ -3,7 +3,7 @@ module.exports = class Mail {
     this.mail = mail;
   }
 
-  async send({ to, subject, html }) {
-    await this.mail.send(to, subject, html);
+  async send({ to, subject, html, fromLabel }) {
+    await this.mail.send(to, subject, html, fromLabel);
   }
 };

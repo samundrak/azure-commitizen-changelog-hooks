@@ -11,9 +11,9 @@ module.exports = class NodeMailer {
     });
   }
 
-  async send(to, subject, content) {
+  async send(to, subject, content, fromLabel) {
     await this.transporter.sendMail({
-      from: process.env.SENDER_ADDRESS,
+      from: `${fromLabel} ${process.env.SENDER_ADDRESS}`,
       to,
       subject,
       html: content,

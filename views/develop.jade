@@ -9,10 +9,14 @@ block content
         each val, key in commits
             if key  !== 'null' && val.items.length
                 p 
-                    strong 
-                        h4(style=`color:${val.color}`)
-                            i(class='material-icons') #{val.icon}
-                            span   #{val.name}
+                    if val.name === 'Features'
+                        strong 
+                            h1(style=`color:${val.color}`)
+                                span   #{val.name}
+                    el
+                        strong 
+                            h4(style=`color:${val.color}`)
+                                span   #{val.name}
                     ul
                     each commit in val.items
                         li= commit.subject

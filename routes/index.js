@@ -1,4 +1,5 @@
 var express = require("express");
+const startCase = require("lodash.startcase");
 const getCommit = require("../core/commits-repo");
 const handleHook = require("../core/handle-hook");
 const { route } = require("./users");
@@ -45,15 +46,16 @@ async function handleMergeHook(req, res, next) {
     const html = await commitIntoHtml(
       concernedCommits,
       resource.repository.name,
-      "https://crm.joinsage.com",
+      `http://${resource.repository.name}-${sourceBranch}.saze.io`,
       {
         targetBranch,
       }
     );
-    await sendMail(
+    sendMail(
       html,
-      `[${resource.repository.name} UPDATE]: ${resource.createdBy.displayName} merged "${sourceBranch}" into "${targetBranch}"`,
-      "samundra.kc6@gmail.com"
+      `${resource.createdBy.displayName} just merged "${sourceBranch}" into "${targetBranch}" with ${concernedCommits.length} commit(s).`,
+      "samundra.khatri@joinsage.com",
+      startCase(resource.repository.name)
     );
     console.log("Mail sent");
     res.send(200);
