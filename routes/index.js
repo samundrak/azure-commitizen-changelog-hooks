@@ -1,17 +1,14 @@
 var express = require("express");
 const startCase = require("lodash.startcase");
 const getCommit = require("../core/commits-repo");
-const handleHook = require("../core/handle-hook");
-const { route } = require("./users");
 var router = express.Router();
-const commits = require("../mock/commits.json");
-const commitIntoFile = require("../core/commit-into-html");
 const groupedCommits = require("../mock/grouped-commits");
 const commitIntoHtml = require("../core/commit-into-html");
 const sendMail = require("../core/send-mail");
+// const { null } = require("../mock/grouped-commits");
 
-const allowedProjects = ["sage-tech-blog", "agent-dashboard", "Fabrikam"];
-const allowedBranches = ["develop", "master"];
+const allowedProjects = process.env.ALLOWED_PROJECTS.split(",");
+const allowedBranches = process.env.ALLOWED_BRANCHES.split(",");
 
 async function handleMergeHook(req, res, next) {
   try {
@@ -27,7 +24,7 @@ async function handleMergeHook(req, res, next) {
     }
     if (!allowedProjects.includes(resource.repository.name))
       return res.sendStatus(200);
-
+    console.log({ data, resource });
     const topCommit = targetBranch === "develop" ? 20 : 50;
     const commits = await getCommit(resource.repository.name, {
       $top: topCommit,
@@ -49,13 +46,18 @@ async function handleMergeHook(req, res, next) {
       `http://${resource.repository.name}-${sourceBranch}.saze.io`,
       {
         targetBranch,
+        sourceBranch,
+        repositoryUrl: resource.repository.remoteUrl,
+        pullRequestUrl: `${process.env.PULL_REQUEST_URL}${resource.repository.name}/pullrequest/${resource.pullRequestId}`,
       }
     );
     sendMail(
       html,
-      `${resource.createdBy.displayName} just merged "${sourceBranch}" into "${targetBranch}" with ${concernedCommits.length} commit(s).`,
+      `${resource.createdBy.displayName} just merged ${sourceBranch} into ${targetBranch}.`,
       process.env.MAIL_RECIPIENTS,
-      startCase(resource.repository.name)
+      `${startCase(resource.repository.name)} | ${
+        resource.createdBy.displayName
+      }`
     );
     console.log("Mail sent");
     res.sendStatus(200);
@@ -66,9 +68,24 @@ async function handleMergeHook(req, res, next) {
 }
 router.post("/api/hook", handleMergeHook);
 router.get("/template/develop", (req, res) => {
+  const sourceBranch = "15900-validation-message";
+  let splittedBranch = (sourceBranch || "").split("-");
+  let ticketNo = null;
+  if (!isNaN(Number(splittedBranch[0]))) {
+    ticketNo = Number(splittedBranch[0]);
+  }
+  const repo = "agent-dashboard";
   return res.render("develop", {
     repo: "agent-dashboard",
     previewHostname: "https://crm.joinsage.com",
+    workItemId: ticketNo,
+    workItemLink: `${process.env.WORKITEM_URL}${ticketNo}`,
+    links: {
+      master: `http://${repo}-master.saze.io`,
+      develop: `http://${repo}-develop.saze.io`,
+      pullRequest: "",
+      repository: "",
+    },
     commits: {
       feat: {
         name: "Features",

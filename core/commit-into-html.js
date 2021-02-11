@@ -4,9 +4,21 @@ const forEach = require("lodash").forEach;
 var conventionalCommitsParser = require("conventional-commits-parser");
 const jade = require("jade");
 const path = require("path");
+const { startCase } = require("lodash");
 
-module.exports = (commits, repo, previewHostname, { targetBranch }) => {
+module.exports = (
+  commits,
+  repo,
+  previewHostname,
+  { targetBranch, sourceBranch, repositoryUrl, pullRequestUrl }
+) => {
   return new Promise((resolve, reject) => {
+    let splittedBranch = (sourceBranch || "").split("-");
+    let ticketNo = null;
+    if (!isNaN(Number(splittedBranch[0]))) {
+      ticketNo = Number(splittedBranch[0]);
+    }
+
     const stream = through.obj();
     forEach(
       commits.map((item) => item.comment),
@@ -33,7 +45,16 @@ module.exports = (commits, repo, previewHostname, { targetBranch }) => {
           path.join(__dirname, "../views/develop.jade")
         );
         var html = renderFunc({
-          repo,
+          workItemId: ticketNo,
+          workItemLink: `${process.env.WORKITEM_URL}${ticketNo}`,
+          links: {
+            master: `http://${repo}-master.saze.io`,
+            develop: `http://${repo}-develop.saze.io`,
+            pullRequest: pullRequestUrl,
+            repository: repositoryUrl,
+            techBlog: process.env.TECH_BLOG_URL,
+          },
+          repo: startCase(repo),
           previewHostname,
           targetBranch,
           commits: {
