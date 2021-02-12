@@ -122,4 +122,38 @@ router.get("/template/develop", (req, res) => {
 router.get("/test", async (req, res) => {
   res.sendStatus(200);
 });
+
+router.post("/api/create-pull-request-comment", async (req, res) => {
+  try {
+    const { resource, ...data } = req.body;
+    const sourceBranch = resource.sourceRefName.split("/").pop();
+    const targetBranch = resource.targetRefName.split("/").pop();
+    if (!allowedBranches.includes(targetBranch)) {
+      return res.sendStatus(200);
+    }
+    if (!allowedProjects.includes(resource.repository.name))
+      return res.sendStatus(200);
+
+    const pullRequestId = resource.pullRequestId;
+    const repositoryId = resource.repository.id;
+    const gitApi = await global.azure.getGitApi();
+    const previewHostname = `http://${resource.repository.name}-${sourceBranch}.saze.io`;
+
+    await gitApi.createThread(
+      {
+        comments: [
+          {
+            content: `Preview of this PR will be available here: [${previewHostname}](${previewHostname})`,
+          },
+        ],
+      },
+      repositoryId,
+      pullRequestId,
+      "Dev"
+    );
+    res.sendStatus(200);
+  } catch (err) {
+    res.sendStatus(500);
+  }
+});
 module.exports = router;
