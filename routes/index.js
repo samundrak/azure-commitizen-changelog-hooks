@@ -143,7 +143,10 @@ router.post("/api/create-pull-request-comment", async (req, res) => {
       {
         comments: [
           {
-            content: `Preview of this PR will be available here: [${previewHostname}](${previewHostname})`,
+            content: `Preview of this PR will be available here: [${previewHostname}](${previewHostname}) 
+Learn more about frontend guidelines here. [Frontend Wiki](https://frontend.saze.io)
+
+`,
           },
         ],
       },
