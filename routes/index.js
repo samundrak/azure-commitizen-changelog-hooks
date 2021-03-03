@@ -60,7 +60,7 @@ async function handleMergeHook(req, res, next) {
       `${resource.createdBy.displayName}
       | ${startCase(resource.repository.name)}`
     );
-    console.log("Mail sent");
+    console.log("Mail is sent");
     res.sendStatus(200);
   } catch (err) {
     console.log(err);
