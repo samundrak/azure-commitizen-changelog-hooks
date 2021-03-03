@@ -9,7 +9,9 @@ const sendMail = require("../core/send-mail");
 
 const allowedProjects = process.env.ALLOWED_PROJECTS.split(",");
 const allowedBranches = process.env.ALLOWED_BRANCHES.split(",");
-
+const allowedPRCommentProjects = process.env.ALLOWED_PR_COMMENT_PROJECTS.split(
+  ","
+);
 async function handleMergeHook(req, res, next) {
   try {
     const { resource, ...data } = req.body;
@@ -56,7 +58,7 @@ async function handleMergeHook(req, res, next) {
       `${resource.createdBy.displayName} just merged ${sourceBranch} into ${targetBranch}.`,
       process.env.MAIL_RECIPIENTS,
       `${resource.createdBy.displayName}
-      <${startCase(resource.repository.name)}>`
+      | ${startCase(resource.repository.name)}`
     );
     console.log("Mail sent");
     res.sendStatus(200);
@@ -130,7 +132,7 @@ router.post("/api/create-pull-request-comment", async (req, res) => {
     if (!allowedBranches.includes(targetBranch)) {
       return res.sendStatus(200);
     }
-    if (!allowedProjects.includes(resource.repository.name))
+    if (!allowedPRCommentProjects.includes(resource.repository.name))
       return res.sendStatus(200);
 
     const pullRequestId = resource.pullRequestId;
