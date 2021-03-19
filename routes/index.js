@@ -129,9 +129,7 @@ router.post("/api/create-pull-request-comment", async (req, res) => {
     const { resource, ...data } = req.body;
     const sourceBranch = resource.sourceRefName.split("/").pop();
     const targetBranch = resource.targetRefName.split("/").pop();
-    if (!allowedBranches.includes(targetBranch)) {
-      return res.sendStatus(200);
-    }
+
     if (!allowedPRCommentProjects.includes(resource.repository.name))
       return res.sendStatus(200);
 
